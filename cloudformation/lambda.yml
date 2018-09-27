@@ -1,0 +1,68 @@
+Resources:
+  ##########################################
+  # Lambda attached to API Gateway
+  ##########################################
+  StartWorkflowAPIGLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/startWorkflow/index.handler
+      MemorySize: 512
+      Role:
+        Fn::GetAtt: [APIGLambdaRole, Arn]
+      Runtime: nodejs8.10
+      Timeout: 30
+      Environment:
+        Variables:
+          WORKFLOW_TABLE:
+            Ref: WorkflowTable
+#      Events:
+#        Api:
+#          Type: Api
+#          Properties:
+#            Path: /workflow
+#            Method: post
+  #Permission to allow the other to invoke the lambda
+  StartWorkflowAPIGLambdaFunctionPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      FunctionName:
+        Ref: StartWorkflowAPIGLambdaFunction
+      SourceArn:
+        Fn::Sub: arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*
+      Principal: apigateway.amazonaws.com
+  #Role
+  APIGLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AWSLambdaFullAccess
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: ['sts:AssumeRole']
+          Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+        Version: '2012-10-17'
+      Policies:
+      - PolicyName: lambdaRoleAPIG
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action: ['cloudwatch:*', 'logs:*']
+            Effect: Allow
+            Resource: '*'
+      - PolicyName: s3
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action: 's3:*'
+            Effect: Allow
+            Resource: 'arn:aws:s3::*'
+      - PolicyName: stepfunctions
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Action: 'states:*'
+            Effect: Allow
+            Resource: '*'

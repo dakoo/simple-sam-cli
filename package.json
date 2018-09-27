@@ -1,0 +1,37 @@
+{
+  "name": "simple-sam-cli",
+  "version": "1.0.0",
+  "description": "This is a CLI tool to make the AWS SAM CLI simpler to use. One line command to make a bucket if not exist, merge multiple cloudformation files, packaging, deploy and create the Cloudformation stack.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dakoo/simple-sam-cli"
+  },
+  "preferGlobal": true,
+  "bin": "./index.js",
+  "keywords": [
+    "aws",
+    "cloudformation",
+    "template",
+    "yaml",
+    "yml",
+    "merge",
+    "package",
+    "sam",
+    "cli",
+    "tool"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.323.0",
+    "cloudformation-yml-merger": "^1.0.5",
+    "colors": "^1.3.2",
+    "execa": "^1.0.0",
+    "fs-extra": "^7.0.0",
+    "json-stringify-safe": "^5.0.1",
+    "lodash": "^4.17.11"
+  }
+}

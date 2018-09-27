@@ -1,0 +1,145 @@
+Resources:
+  ##########################################
+  # DynamoDB Table backed for API Gateway
+  ##########################################
+  ## https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-dynamodb-table.html
+  WorkflowTable:
+    Type: AWS::DynamoDB::Table
+    #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-deletionpolicy.html
+    Properties:
+      ## Name
+      TableName: Workflow
+      ## Schema
+      AttributeDefinitions:
+      -
+        AttributeName: "WorkflowId"
+        AttributeType: "S"
+      -
+        AttributeName: "User"
+        AttributeType: "S"
+      ## Partition key and Sort key
+      KeySchema:
+      -
+        AttributeName: "WorkflowId"
+        KeyType: "HASH"
+      -
+        AttributeName: "User"
+        KeyType: "RANGE"
+      ## Default capacity
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      ## TTL
+      TimeToLiveSpecification:
+        AttributeName: 'ttl'
+        Enabled: True
+      ## Enable DDB Stream. See https://apimeister.com/2018/01/10/implementing-dynamodb-triggers-streams-using-cloudformation.html
+      #StreamSpecification:
+      #  StreamViewType: NEW_IMAGE
+      ## GSI
+      GlobalSecondaryIndexes:
+      - IndexName: "GSI"
+        KeySchema:
+        - AttributeName: "User"
+          KeyType: "HASH"
+        Projection:
+          ProjectionType: "KEYS_ONLY"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+  # Write Capacity Autoscaling
+  WriteCapacityScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 15
+      MinCapacity: 5
+      ResourceId:
+        Fn::Sub: "table/${ WorkflowTable }"
+      RoleARN:
+        Fn::GetAtt: [ScalingRole, Arn]
+      ScalableDimension: dynamodb:table:WriteCapacityUnits
+      ServiceNamespace: dynamodb
+    DependsOn:
+    - WorkflowTable
+  #Policy for Write Capacity Auto scaling
+  WriteScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: WriteAutoScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId:
+        Ref: WriteCapacityScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        # The metric should be around that value - so 70% of capacity usage is the target
+        TargetValue: 50.0
+        # The amount of time, in seconds, after a scale in activity completes before another scale in activity can start.
+        ScaleInCooldown: 10
+        ScaleOutCooldown: 10
+        PredefinedMetricSpecification:
+          PredefinedMetricType: DynamoDBWriteCapacityUtilization
+    DependsOn:
+    - WorkflowTable
+    - WriteCapacityScalableTarget
+  #Read Capacity Autoscaling
+  ReadCapacityScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 15
+      MinCapacity: 5
+      ResourceId:
+        Fn::Sub: "table/${ WorkflowTable }"
+      RoleARN:
+        Fn::GetAtt: [ScalingRole, Arn]
+      ScalableDimension: dynamodb:table:ReadCapacityUnits
+      ServiceNamespace: dynamodb
+    DependsOn:
+    - WorkflowTable
+  #Policy for Read Capacity Auto scaling
+  ReadScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: ReadAutoScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId:
+        Ref: ReadCapacityScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: 50.0 # Utilization percentage
+        ScaleInCooldown: 10
+        ScaleOutCooldown: 10
+        PredefinedMetricSpecification:
+          PredefinedMetricType: DynamoDBReadCapacityUtilization
+    DependsOn:
+    - WorkflowTable
+    - ReadCapacityScalableTarget
+  #Role for Dynamodb Autoscaling
+  ScalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        -
+          Effect: "Allow"
+          Principal:
+            Service:
+            - application-autoscaling.amazonaws.com
+          Action:
+          - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+      -
+        PolicyName: "root"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          -
+            Effect: "Allow"
+            Action:
+            - "dynamodb:DescribeTable"
+            - "dynamodb:UpdateTable"
+            - "cloudwatch:PutMetricAlarm"
+            - "cloudwatch:DescribeAlarms"
+            - "cloudwatch:GetMetricStatistics"
+            - "cloudwatch:SetAlarmState"
+            - "cloudwatch:DeleteAlarms"
+            Resource: "*"
