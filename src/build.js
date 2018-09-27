@@ -22,12 +22,17 @@ const moveDir = (source, target) => {
     fs.moveSync(source, target);
 };
 
+const copyDir = (source, target) => {
+    logger.info(`copying ${source} to ${target}...`);
+    fs.copySync(source, target);
+};
+
 const copyFile = (source, target) => {
     logger.info(`copying ${source} to ${target}...`);
     fs.copySync(source, target);
 };
 
-const updatePackageJsonForDeployment = (templateFolderName) => {
+const updatePackageJsonForDeployment = () => {
     logger.info('updating package.json...');
     const jsonObject = packagejson.read();
     //get rid of node modules for test
@@ -52,16 +57,19 @@ const mergeCloudFormation = async (templateFolderPath, mergeFilePath) => {
     merge(templateFolderPath, mergeFilePath);
 };
 
-exports.default = async (templateFolderName) => {
+exports.default = async (templateFolderName, srcFolderName) => {
     logger.debug('build...');
     const currentPath = process.cwd();
     deleteDir(currentPath + '/build');
     createDir(currentPath + '/build');
     createDir(currentPath + '/build/backup');
-    createDir(currentPath + '/build/src');
     copyFile(currentPath + '/package.json', currentPath + '/build/backup/package.json');
     moveDir(currentPath + '/node_modules', currentPath + '/build/backup/node_modules');
-    updatePackageJsonForDeployment(templateFolderName);
+    if (srcFolderName) {
+        createDir(currentPath + '/build/' + srcFolderName);
+        copyDir(currentPath + '/' + srcFolderName, currentPath + '/build/' + srcFolderName);
+    }
+    updatePackageJsonForDeployment();
     await runNpmInstall();
     moveDir(currentPath + '/node_modules', currentPath + '/build/node_modules');
     copyFile(currentPath + '/build/backup/package.json', currentPath + '/package.json');

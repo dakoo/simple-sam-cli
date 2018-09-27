@@ -13,7 +13,7 @@ const help = () => {
     logger.info('Examples:');
     logger.info('');
     logger.info('    $ simple-sam-cli prepare -b <bucket-name> -r <s3-region>');
-    logger.info('    $ simple-sam-cli build -f <cloudformation-folder>');
+    logger.info('    $ simple-sam-cli build -cf <cloudformation-folder> -sf <lambda-source-folder>');
     logger.info('    $ simple-sam-cli deploy -b <bucket-name> -s <cloud-foramtion-stack-name>');
     logger.info('    $ simple-sam-cli clean');
     logger.info('    $ simple-sam-cli all -b <bucket-name> -r <s3-region> -f <cloudformation-folder> -s <cloud-formation-stack-name>');
@@ -59,19 +59,25 @@ const run = async () => {
             break;
         }
         case 'build': {
-            let folder = getParameter(argv, '-f');
-            if (!folder) {
-                folder = _.get(jsonObject, 'simple-sam-cli.cloudformation-template-folder');
+            let cloudformationFolder = getParameter(argv, '-cf');
+            let sourceFolder = getParameter(argv, '-sf');
+            if (!cloudformationFolder) {
+                cloudformationFolder = _.get(jsonObject, 'simple-sam-cli.cloudformation-template-folder');
             } else {
-                _.set(jsonObject, 'simple-sam-cli.cloudformation-template-folder', folder);
+                _.set(jsonObject, 'simple-sam-cli.cloudformation-template-folder', cloudformationFolder);
             }
-            if (!folder) {
+            if (!sourceFolder) {
+                sourceFolder = _.get(jsonObject, 'simple-sam-cli.source-folder');
+            } else {
+                _.set(jsonObject, 'simple-sam-cli.source-folder', sourceFolder);
+            }
+            if (!cloudformationFolder) {
                 help();
                 process.exit(1);
             } else {
                 packagejson.write(jsonObject);
             }
-            await build(folder);
+            await build(cloudformationFolder, sourceFolder);
             break;
         }
         case 'deploy': {
