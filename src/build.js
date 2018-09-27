@@ -40,7 +40,7 @@ const updatePackageJsonForDeployment = () => {
         delete jsonObject.devDependencies;
     }
     //get rid of the aws-sdk which is provided by AWS.
-    if (_.get(jsonObject, 'devDependencies[aws-sdk]')) {
+    if (_.get(jsonObject, 'dependencies[aws-sdk]')) {
         delete jsonObject.dependencies['aws-sdk'];
     }
     packagejson.write(jsonObject);

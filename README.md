@@ -8,7 +8,7 @@ The [SAM CLI](https://github.com/awslabs/aws-sam-cli) is a great tool especially
 The SAM CLI could be much better because this simple-sam-cli...
 
 - Merges multiple cloudformation template files to one file for the SAM CLI to make a package. 
-- Deploys with the smaller size of package by deleting the dev dependencies and aws-sdk dependency. After deployment, the dependencies are recovered automatically.
+- Deploys with the smaller size of package by deleting the dev dependencies and aws-sdk dependency to use the built-in IDE on the lambda functions. After deployment, the dependencies are recovered automatically.
 - Records the user configuration in the package.json so you don't have to provide the configuration over and over again.
 - Provides all-in-one command.
 
@@ -109,4 +109,20 @@ This is to get rid of the build folder.
 
 ```
 $ simple-sam-cli clean
+```
+
+## simple-sam-cli all
+
+This is all-in-one command. 
+
+```
+$ simple-sam-cli all -b <bucket-name> -r <region>  -cf <cloudformation-templates-folder> -sf <source-folder>  -s <cloud-foramtion-stack-name>
+```
+
+Once you call this, you don't have to provide configuration again and again. 
+
+just 
+
+```
+$ simple-sam-cli all 
 ```
