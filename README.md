@@ -153,7 +153,7 @@ The configuration is stored in the package.json as below.
         "stack": "a-great-stack-name",
         "source-folder": "src",
         "tags": "--tags tag1=v1 tag2=v2",
-        "parameters": "--parameter-overrides param1=value1 param2=value2",
+        "parameters": "--parameter-overrides param1=value1 param2=value2"
     },
     ...
 }
