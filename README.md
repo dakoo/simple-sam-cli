@@ -7,9 +7,11 @@ This is a CLI tool to simplify the AWS SAM CLI with Javascript. One line command
 The [SAM CLI](https://github.com/awslabs/aws-sam-cli) is a great tool especially for packaging and deploying multiple lambda functions simultaneously. 
 The SAM CLI could be much better because this simple-sam-cli...
 
+- Creates a private S3 bucket for deployment after checking the existence. 
 - Merges multiple cloudformation template files to one file for the SAM CLI to make a package. 
 - Deploys with the smaller size of package by deleting the dev dependencies and aws-sdk dependency to use the built-in IDE on the lambda functions. After deployment, the dependencies are recovered automatically.
 - Records the user configuration in the package.json so you don't have to provide the configuration over and over again.
+- You can change the configuration very easily. One way is by providing new parameter values to override the configuration and another way is by updating the package.json to add/change the configuration.
 - Provides all-in-one command.
 
 # Installation
@@ -17,6 +19,7 @@ The SAM CLI could be much better because this simple-sam-cli...
 ## Prerequisite
 
 Make sure the [SAM CLI](https://github.com/awslabs/aws-sam-cli) is installed.
+The project should be javascript(node.js) based. not python, go or Java. The package.json should be located in the project root folder.
 
 ## installation
 
@@ -26,7 +29,7 @@ npm install -g simple-sam-cli
 
 # How to use
 
-In the Javascript SAM project, use the following commands.
+Run the following commands on the project root folder.
 
 ## simple-sam-cli prepare
 
