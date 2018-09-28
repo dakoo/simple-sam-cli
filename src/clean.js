@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const logger = require('./utils/colorLogger');
 const fs = require('fs-extra');
 

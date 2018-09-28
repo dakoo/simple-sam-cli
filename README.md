@@ -98,10 +98,19 @@ $ simple-sam-cli build
 This is to upload the package and create the cloudformation stack.
 
 ```
-$ simple-sam-cli deploy -b <bucket-name> -s <cloud-foramtion-stack-name>
+$ simple-sam-cli deploy -b <bucket-name> -s <cloudforamtion-stack-name>
 ```
 
+Also, the parameters and tags would be set as the following example. They are the same as the [AWS cloudformation deploy command](https://docs.aws.amazon.com/cli/latest/reference/cloudformation/deploy/index.html). 
+
+ 
+```
+$ simple-sam-cli deploy -b unique-bucket-name -s cloudforamtion-stack-name --parameter-overrides Key1=Value1 Key2=Value2 --tags Key1=Value1 Key2=Value2
+```
+
+
 If you created the bucket via `simple-sam-cli prepare`, you don't need to provide the bucket name here because it reads the configuration from the package.json.
+
 
 ## simple-sam-cli clean
 
@@ -116,12 +125,12 @@ $ simple-sam-cli clean
 This is all-in-one command. 
 
 ```
-$ simple-sam-cli all -b <bucket-name> -r <region>  -cf <cloudformation-templates-folder> -sf <source-folder>  -s <cloud-foramtion-stack-name>
+$ simple-sam-cli all -b <bucket-name> -r <region>  -cf <cloudformation-templates-folder> -sf <source-folder>  -s <cloud-foramtion-stack-name> 
 ```
 
-Once you call this, you don't have to provide configuration again and again. 
+Also, you can provide the --parameter-overrides and --tags as the same as the `simple-sam-cli` deploy command
 
-just 
+Once you call this, you don't have to provide configuration again and again. You can just run as below.
 
 ```
 $ simple-sam-cli all 

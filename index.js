@@ -29,6 +29,24 @@ const getParameter = (argv, flag) => {
     return argv[index + 1];
 };
 
+const getParameterOverrides = (argvString) => {
+    const parametersRegex = /--parameter-overrides((\s+[\w-.]+=[\w-.]+)+)/;
+    const parameters = parametersRegex.exec(argvString);
+    if (parameters) {
+        return parameters[0];
+    }
+    return undefined;
+};
+
+const getTags = (argvString) => {
+    const tagsRegex = /--tags((\s+[\w-.]+=[\w-.]+)+)/;
+    const tags = tagsRegex.exec(argvString);
+    if (tags) {
+        return tags[0];
+    }
+    return undefined;
+};
+
 const run = async () => {
     const argv = process.argv.concat([]);
     argv.shift();
@@ -97,13 +115,26 @@ const run = async () => {
                 stackName = _.get(jsonObject, 'name');
                 _.set(jsonObject, 'simple-sam-cli.stack', stackName);
             }
+            const argvString = argv.join(' ');
+            let parameters = getParameterOverrides(argvString);
+            let tags = getTags(argvString);
+            if (!parameters) {
+                parameters = _.get(jsonObject, 'simple-sam-cli.parameters');
+            } else {
+                _.set(jsonObject, 'simple-sam-cli.parameters', parameters);
+            }
+            if (!tags) {
+                tags = _.get(jsonObject, 'simple-sam-cli.tags');
+            } else {
+                _.set(jsonObject, 'simple-sam-cli.tags', tags);
+            }
             if (!bucket || !stackName) {
                 help();
                 process.exit(1);
             } else {
                 packagejson.write(jsonObject);
             }
-            await deploy(bucket, stackName);
+            await deploy(bucket, stackName, parameters, tags);
             break;
         }
         case 'clean': {
@@ -145,6 +176,19 @@ const run = async () => {
                 stackName = _.get(jsonObject, 'name');
                 _.set(jsonObject, 'simple-sam-cli.stack', stackName);
             }
+            const argvString = argv.join(' ');
+            let parameters = getParameterOverrides(argvString);
+            let tags = getTags(argvString);
+            if (!parameters) {
+                parameters = _.get(jsonObject, 'simple-sam-cli.parameters');
+            } else {
+                _.set(jsonObject, 'simple-sam-cli.parameters', parameters);
+            }
+            if (!tags) {
+                tags = _.get(jsonObject, 'simple-sam-cli.tags');
+            } else {
+                _.set(jsonObject, 'simple-sam-cli.tags', tags);
+            }
             if (!bucket || !region || !cloudformationFolder || !stackName) {
                 help();
                 process.exit(1);
@@ -153,7 +197,7 @@ const run = async () => {
             }
             await prepare(bucket, region);
             await build(cloudformationFolder, sourceFolder);
-            await deploy(bucket, stackName);
+            await deploy(bucket, stackName, parameters, tags);
             await clean();
             break;
         }

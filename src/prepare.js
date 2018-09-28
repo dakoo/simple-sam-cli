@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const AWS = require('aws-sdk');
 const logger = require('./utils/colorLogger');
 const spawn = require('./utils/spawn').default;
@@ -21,7 +19,7 @@ const checkBucket = async (bucket) => {
 
 const createBucket = async (bucket, region) => {
     logger.debug('creating bucket...');
-    const command = `aws s3 mb s3://${bucket} --region ${region}`;
+    const command = `aws s3api create-bucket --bucket ${bucket} --region ${region}`;
     return spawn(command);
 };
 
