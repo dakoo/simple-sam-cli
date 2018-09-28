@@ -139,7 +139,7 @@ Once you call this, you don't have to provide configuration again and again. You
 $ simple-sam-cli all 
 ```
 
-## package.json
+# Configuration in package.json
 
 The configuration is stored in the package.json as below.
 
