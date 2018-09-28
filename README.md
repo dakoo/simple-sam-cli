@@ -138,3 +138,25 @@ Once you call this, you don't have to provide configuration again and again. You
 ```
 $ simple-sam-cli all 
 ```
+
+## package.json
+
+The configuration is stored in the package.json as below.
+
+```
+{
+    ...
+    "simple-sam-cli": {
+        "bucket": "bucket-name",
+        "region": "us-east-1",
+        "cloudformation-template-folder": "cloudformation",
+        "stack": "a-great-stack-name",
+        "source-folder": "src",
+        "tags": "--tags tag1=v1 tag2=v2",
+        "parameters": "--parameter-overrides param1=value1 param2=value2",
+    },
+    ...
+}
+```
+
+You can directly add the properties with the values for your project. Then the commands could be much simpler because you don't have to add any flags.

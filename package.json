@@ -1,6 +1,6 @@
 {
   "name": "simple-sam-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "This is a CLI tool to make the AWS SAM CLI simpler to use. One line command to make a bucket if not exist, merge multiple cloudformation files, packaging, deploy and create the Cloudformation stack.",
   "main": "index.js",
   "scripts": {
